@@ -19,6 +19,7 @@ namespace Base {
 
 		virtual void Reset (void) = 0;
 
+
 		virtual bool Update (const void *pData, uint64_t dataSize) = 0;
 		
 		bool UpdateString (const char *pString) {
@@ -54,6 +55,35 @@ namespace Base {
 
 	};
 
+
+
+
+	template <size_t MessageBlockSize, typename MessageSizeType, typename HashValueType> class CHashBaseWithMessageBlock : public CHashBase< HashValueType> {
+	protected:
+		uint8_t m_MessageBlock[MessageBlockSize];
+		MessageSizeType  m_AllMessageSize;
+		size_t m_MessageAddPosition;
+
+		virtual void BlockProcess (void) = 0;
+		virtual void MessageBufferProcess (void) {
+			BlockProcess ();
+			m_AllMessageSize += MessageBlockSize;
+		}
+
+	public:
+
+		static const size_t m_MessageBlockSize = MessageBlockSize;
+
+		CHashBaseWithMessageBlock () {
+			Reset ();
+		}
+
+		virtual void Reset (void) {
+			m_MessageAddPosition = 0;
+			m_AllMessageSize = 0;
+		}
+
+	};
 }
 
 END_HSHASH_NAMESPACE

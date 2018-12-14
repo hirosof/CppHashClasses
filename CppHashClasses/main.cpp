@@ -1,7 +1,7 @@
 #include <stdio.h>
 #include "HSSHA1.hpp"
 #include "HSSHA2.hpp"
-
+#include "HSHMAC.hpp"
 void ShowStringHash (const char *pString);
 
 
@@ -13,7 +13,10 @@ template <typename T> void ShowHash (const hirosof::Hash::Base::CHashBase<T>  &h
 
 	if (hash.GetHash (&value)) {
 		printf ("%s\n", value.ToString ().c_str ());
-	}	
+	} else {
+		printf ("err\n");
+	}
+
 }
 
 
@@ -23,12 +26,21 @@ void HMACCodeTest (void);
 
 int main (void) {
 	using namespace hirosof::Hash;
+	using namespace hirosof::Hash::HMAC;
 
-	HMACCodeTest ();
+	
+	char keystr[] = "key";
+	
+	CHMACKeySHA512Per224Builder kb;
+	kb.UpdateString (keystr);
+	kb.Finalize ();
 
+	CHMACSHA512Per224 hmac512_224(kb);
+	hmac512_224.ComputeString ("message");
 
+	ShowHash (hmac512_224);
 
-
+	
 	return 0;
 }
 void Test (void) {
@@ -114,12 +126,61 @@ void HMACCodeTest (void) {
 
 
 	char key[] = "key";
+	size_t key_len = strlen (key);
 	char data[] = "data";
 
+	if (key_len > 64) return;
 
 	ShowStringHash (data);
 
 	printf ("HMAC-SHA1‚ÌŽÀŒ±\n");
+
+	uint8_t k0[64];
+
+	memcpy (k0, key, key_len);
+	memset (k0 + key_len, 0, 64 - key_len);
+
+
+	CSHA1 isha1;
+
+	for (size_t i = 0; i < 64; i++)
+	{
+		uint8_t c = k0[i] ^ 0x36;
+		isha1.Update (&c, 1);
+	}
+
+	isha1.UpdateString (data);
+	isha1.Finalize ();
+
+
+
+	CSHA1 osha1;
+	for (size_t i = 0; i < 64; i++)
+	{
+		uint8_t c = k0[i] ^ 0x5c;
+		osha1.Update (&c, 1);
+	}
+
+
+	CSHA1Value ival;
+	isha1.GetHash (&ival);
+
+
+	for (size_t i = 0; i < ival.Count(); i++)
+	{
+		uint8_t c = ival[i];
+		osha1.Update (&c, 1);
+	}
+
+
+	osha1.Finalize ();
+
+
+	ShowHash (osha1);
+
+
+
+
 
 
 

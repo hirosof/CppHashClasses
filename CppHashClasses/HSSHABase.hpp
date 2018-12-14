@@ -6,56 +6,39 @@ BEGIN_HSHASH_NAMESPACE
 
 namespace Base {
 
-	template <size_t MessageBufferSize , typename MessageSizeType ,typename HashValueType> class CSHABase : public CHashBase< HashValueType> {
-	protected:
-		uint8_t m_MessageBuffer[MessageBufferSize];
-		MessageSizeType  m_AllMessageSize;
-		size_t m_MessageAddPosition;
+	template <size_t MessageBlockSize , typename MessageSizeType ,typename HashValueType> 
+	class CSHABase : public CHashBaseWithMessageBlock<MessageBlockSize , MessageSizeType ,  HashValueType> {
 
-		virtual void BlockProcess (void) = 0;
-		virtual void MessageBufferProcess (void) {
-			BlockProcess ();
-			m_AllMessageSize += MessageBufferSize;
-		}
 
 	public:
-
-		CSHABase () {
-			Reset ();
-		}
-
-		virtual void Reset (void) {
-			m_MessageAddPosition = 0;
-			m_AllMessageSize = 0;
-		}
 
 		virtual bool Update (const void *pData, uint64_t dataSize) {
 			if (this->State != EComputeState::Updatable) return false;
 			if (pData == nullptr) return false;
 			if (dataSize == 0)return false;
-
+			
 			const uint8_t *lpBytesData = static_cast<const uint8_t*>(pData);
+			
+			if (this->m_MessageAddPosition + dataSize >= MessageBlockSize) {
 
-			if (m_MessageAddPosition + dataSize >= MessageBufferSize) {
+				size_t addfirstSize = MessageBlockSize - this->m_MessageAddPosition;
 
-				size_t addfirstSize = MessageBufferSize - this->m_MessageAddPosition;
-
-				memcpy (&this->m_MessageBuffer[m_MessageAddPosition], lpBytesData, addfirstSize);
+				memcpy (&this->m_MessageBlock[this->m_MessageAddPosition], lpBytesData, addfirstSize);
 
 				this->MessageBufferProcess ();
-				uint64_t NumBlock = (dataSize - addfirstSize) / MessageBufferSize;
-				size_t NumRest = (dataSize - addfirstSize) % MessageBufferSize;
+				uint64_t NumBlock = (dataSize - addfirstSize) / MessageBlockSize;
+				size_t NumRest = (dataSize - addfirstSize) % MessageBlockSize;
 				const uint8_t *lpRestBytesData = lpBytesData + addfirstSize;
 
 				for (uint64_t i = 0; i < NumBlock; i++) {
-					memcpy (&this->m_MessageBuffer[0], lpBytesData + MessageBufferSize*i, MessageBufferSize);
+					memcpy (&this->m_MessageBlock[0], lpRestBytesData + MessageBlockSize*i, MessageBlockSize);
 					this->MessageBufferProcess ();
 				}
-				memcpy (&this->m_MessageBuffer[0], lpBytesData + MessageBufferSize*NumBlock, MessageBufferSize);
+				memcpy (&this->m_MessageBlock[0], lpRestBytesData + MessageBlockSize*NumBlock, NumRest);
 			} else {
-				memcpy (&this->m_MessageBuffer[m_MessageAddPosition], pData, static_cast<size_t>(dataSize));
+				memcpy (&this->m_MessageBlock[this->m_MessageAddPosition], pData, static_cast<size_t>(dataSize));
 			}
-			this->m_MessageAddPosition  = (this->m_MessageAddPosition + dataSize) % MessageBufferSize;
+			this->m_MessageAddPosition  = (this->m_MessageAddPosition + dataSize) % MessageBlockSize;
 
 			return true;
 		}
@@ -70,19 +53,19 @@ namespace Base {
 			uint64_t finalDataSize = this->m_AllMessageSize + this->m_MessageAddPosition;
 			uint64_t finalDataBitsSize = finalDataSize * 8;
 
-			this->m_MessageBuffer[this->m_MessageAddPosition] = 0x80;
+			this->m_MessageBlock[this->m_MessageAddPosition] = 0x80;
 
-			memset (&this->m_MessageBuffer[this->m_MessageAddPosition + 1], 0, 64 - (this->m_MessageAddPosition + 1));
+			memset (&this->m_MessageBlock[this->m_MessageAddPosition + 1], 0, 64 - (this->m_MessageAddPosition + 1));
 
 			//0x80をセットした位置が448ビット目(56バイト目) 
 			//以上であればハッシュブロックを実行する
 			if (this->m_MessageAddPosition >= 56) {
 				this->BlockProcess ();
-				memset (this->m_MessageBuffer, 0, 56);
+				memset (this->m_MessageBlock, 0, 56);
 			}
 
 			for (size_t i = 0; i < 8; i++) {
-				this->m_MessageBuffer[63 - i] = (finalDataBitsSize >> (8 * i)) & 0xFF;
+				this->m_MessageBlock[63 - i] = (finalDataBitsSize >> (8 * i)) & 0xFF;
 			}
 
 			this->BlockProcess ();
@@ -102,20 +85,20 @@ namespace Base {
 			uint64_t finalDataSize = this->m_AllMessageSize + this->m_MessageAddPosition;
 			uint64_t finalDataBitsSize = finalDataSize * 8;
 
-			this->m_MessageBuffer[this->m_MessageAddPosition] = 0x80;
+			this->m_MessageBlock[this->m_MessageAddPosition] = 0x80;
 
-			memset (&this->m_MessageBuffer[this->m_MessageAddPosition + 1], 0, 128 - (this->m_MessageAddPosition + 1));
+			memset (&this->m_MessageBlock[this->m_MessageAddPosition + 1], 0, 128 - (this->m_MessageAddPosition + 1));
 
 			//0x80をセットした位置が896ビット目(112バイト目) 
 			//以上であればハッシュブロックを実行する
 			if (this->m_MessageAddPosition >= 112) {
 				uint32_t targetSize = this->m_MessageAddPosition;
 				this->BlockProcess ();
-				memset (this->m_MessageBuffer, 0, targetSize);
+				memset (this->m_MessageBlock, 0, targetSize);
 			}
 
 			for (size_t i = 0; i < 8; i++) {
-				this->m_MessageBuffer[127 - i] = (finalDataBitsSize >> (8 * i)) & 0xFF;
+				this->m_MessageBlock[127 - i] = (finalDataBitsSize >> (8 * i)) & 0xFF;
 			}
 
 			this->BlockProcess ();

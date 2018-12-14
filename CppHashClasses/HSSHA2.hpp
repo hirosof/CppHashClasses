@@ -48,10 +48,10 @@ namespace Base {
 
 			//入力データを16ブロックに分割
 			for (int i = 0, j = 0; i < 16; i++, j += 4) {
-				Data[i] = this->m_MessageBuffer[j] << 24;
-				Data[i] |= this->m_MessageBuffer[j + 1] << 16;
-				Data[i] |= this->m_MessageBuffer[j + 2] << 8;
-				Data[i] |= this->m_MessageBuffer[j + 3];
+				Data[i] = this->m_MessageBlock[j] << 24;
+				Data[i] |= this->m_MessageBlock[j + 1] << 16;
+				Data[i] |= this->m_MessageBlock[j + 2] << 8;
+				Data[i] |= this->m_MessageBlock[j + 3];
 			}
 
 			//Data[16]～Data[63]まで準備
@@ -155,7 +155,7 @@ namespace Base {
 
 			uint64_t W[80];
 
-			memcpy (W, this->m_MessageBuffer, 128); // uint64_tのサイズ(8バイト) * 16要素 = 128バイト
+			memcpy (W, this->m_MessageBlock, 128); // uint64_tのサイズ(8バイト) * 16要素 = 128バイト
 
 			for (uint32_t i = 0; i < 16; i++) {
 				W[i] = this->ByteReverse (W[i]);

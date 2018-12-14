@@ -34,10 +34,10 @@ void hirosof::Hash::CSHA1::BlockProcess (void)
 
 	//入力データを16ブロックに分割
 	for (int i = 0, j = 0; i < 16; i++, j += 4) {
-		Data[i] = this->m_MessageBuffer[j] << 24;
-		Data[i] |= this->m_MessageBuffer[j + 1] << 16;
-		Data[i] |= this->m_MessageBuffer[j + 2] << 8;
-		Data[i] |= this->m_MessageBuffer[j + 3];
+		Data[i] = this->m_MessageBlock[j] << 24;
+		Data[i] |= this->m_MessageBlock[j + 1] << 16;
+		Data[i] |= this->m_MessageBlock[j + 2] << 8;
+		Data[i] |= this->m_MessageBlock[j + 3];
 	}
 
 	//Data[16]～Data[79]までローテート関数を使ってデータ準備

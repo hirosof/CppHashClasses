@@ -152,6 +152,7 @@
     <ClCompile Include="main.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="HSHMAC.hpp" />
     <ClInclude Include="HSSHA2.hpp" />
     <ClInclude Include="HSHashBase.hpp" />
     <ClInclude Include="HSHashDefine.hpp" />
