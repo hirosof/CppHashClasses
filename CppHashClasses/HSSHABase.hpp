@@ -8,9 +8,10 @@ namespace Base {
 
 	template <size_t MessageBlockSize , typename MessageSizeType ,typename HashValueType> 
 	class CSHABase : public CHashBaseWithMessageBlock<MessageBlockSize , MessageSizeType ,  HashValueType> {
-
-
+	private:
+		using BaseType = CHashBaseWithMessageBlock<MessageBlockSize, MessageSizeType, HashValueType>;
 	public:
+
 
 		virtual bool Update (const void *pData, uint64_t dataSize) {
 			if (this->State != EComputeState::Updatable) return false;
@@ -42,6 +43,14 @@ namespace Base {
 
 			return true;
 		}
+
+		virtual bool Update (const char *pString) {
+			return BaseType::Update (pString);
+		}
+		virtual bool Update (const wchar_t *pString) {
+			return BaseType::Update (pString);
+		}
+
 	};
 
 	template <typename HashValueType> class CSHABase32BitUnit : public  CSHABase<64, uint64_t, HashValueType> {

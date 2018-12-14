@@ -56,7 +56,7 @@ bool hirosof::Hash::CSHA224::GetHash (HashValueType * pHash) const
 	if (this->State != EComputeState::Finalized) return false;
 
 	if (pHash != nullptr) {
-		CSHA224Value::ElementType out[CSHA224Value::ElementSize];
+		CSHA224Value::ElementType out[CSHA224Value::m_ElementSize];
 		memcpy (out, this->m_HashBlockData, sizeof (out));
 		*pHash = HashValueType (out);
 		return true;
@@ -100,7 +100,7 @@ bool hirosof::Hash::CSHA384::GetHash (HashValueType * pHash) const
 	if (this->State != EComputeState::Finalized) return false;
 
 	if (pHash != nullptr) {
-		CSHA384Value::ElementType out[CSHA384Value::ElementSize];
+		CSHA384Value::ElementType out[CSHA384Value::m_ElementSize];
 		memcpy (out, this->m_HashBlockData, sizeof (out));
 		*pHash = HashValueType (out);
 		return true;
@@ -144,7 +144,7 @@ bool hirosof::Hash::CSHA512Per224::GetHash (HashValueType * pHash) const
 	if (this->State != EComputeState::Finalized) return false;
 
 	if (pHash != nullptr) {
-		CSHA512Per224Value::ElementType out[CSHA512Per224Value::ElementSize];
+		CSHA512Per224Value::ElementType out[CSHA512Per224Value::m_ElementSize];
 		memcpy (out, this->m_HashBlockData, sizeof (out));
 		*pHash = HashValueType (out);
 		return true;
@@ -166,7 +166,7 @@ bool hirosof::Hash::CSHA512Per256::GetHash (HashValueType * pHash) const
 	if (this->State != EComputeState::Finalized) return false;
 
 	if (pHash != nullptr) {
-		CSHA512Per256Value::ElementType out[CSHA512Per256Value::ElementSize];
+		CSHA512Per256Value::ElementType out[CSHA512Per256Value::m_ElementSize];
 		memcpy (out, this->m_HashBlockData, sizeof (out));
 		*pHash = HashValueType (out);
 		return true;

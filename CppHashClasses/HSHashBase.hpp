@@ -20,14 +20,16 @@ namespace Base {
 		virtual void Reset (void) = 0;
 
 
-		virtual bool Update (const void *pData, uint64_t dataSize) = 0;
+		virtual bool Update (const void *pData, uint64_t dataSize) {
+			return false;
+		}
 		
-		bool UpdateString (const char *pString) {
+		virtual bool Update (const char *pString) {
 			if (pString == nullptr) return false;
 			return this->Update (pString, strlen (pString));
 		}
 
-		bool UpdateString (const wchar_t *pString) {
+		virtual bool Update (const wchar_t *pString) {
 			if (pString == nullptr) return false;
 			return this->Update (pString, wcslen (pString));
 		}
@@ -37,28 +39,30 @@ namespace Base {
 		virtual bool GetHash (HashValueType *pHash) const = 0;
 
 		bool Compute (const void *pData, uint64_t dataSize) {
-			if (this->Update (pData, dataSize)) {
-				return this->Finalize ();
+			if (pData == nullptr) return false;
+			if (dataSize > 0) {
+				if (this->Update (pData, dataSize) == false) {
+					return false;
+				}
 			}
-			return false;
+			return this->Finalize ();
 		}
 
-		bool ComputeString (const char *pString) {
+		bool Compute (const char *pString) {
 			if (pString == nullptr) return false;
 			return this->Compute (pString, strlen (pString));
 		}
 
-		bool ComputeString (const wchar_t *pString) {
+		bool Compute (const wchar_t *pString) {
 			if (pString == nullptr) return false;
 			return this->Compute (pString, wcslen (pString));
 		}
 
 	};
 
-
-
-
-	template <size_t MessageBlockSize, typename MessageSizeType, typename HashValueType> class CHashBaseWithMessageBlock : public CHashBase< HashValueType> {
+	template <size_t MessageBlockSize, typename MessageSizeType, typename HashValueType>
+	class CHashBaseWithMessageBlock : public CHashBase< HashValueType> {
+	
 	protected:
 		uint8_t m_MessageBlock[MessageBlockSize];
 		MessageSizeType  m_AllMessageSize;

@@ -110,16 +110,35 @@ namespace HMAC {
 			return true;
 		}
 
-		bool UpdateString (const char *pString) {
+		bool Update (const char *pString) {
 			if (pString == nullptr) return false;
 			return this->Update (pString, strlen (pString));
 		}
 
-		bool UpdateString (const wchar_t *pString) {
+		bool Update (const wchar_t *pString) {
 			if (pString == nullptr) return false;
 			return this->Update (pString, wcslen (pString));
 		}
 
+		bool Compute (const void *pData, uint64_t dataSize) {
+			if (pData == nullptr) return false;
+			if (dataSize > 0) {
+				if (this->Update (pData, dataSize) == false) {
+					return false;
+				}
+			}
+			return this->Finalize ();
+		}
+
+		bool Compute (const char *pString) {
+			if (pString == nullptr) return false;
+			return this->Compute (pString, strlen (pString));
+		}
+
+		bool Compute (const wchar_t *pString) {
+			if (pString == nullptr) return false;
+			return this->Compute (pString, wcslen (pString));
+		}
 
 		bool Finalize (void) {
 			if (State != EComputeState::Updatable) return false;
@@ -214,6 +233,14 @@ namespace HMAC {
 			return this->m_ihash.Update (pData, dataSize);
 		}
 
+		bool Update (const char *pString) {
+			return Base::CHashBase<typename HashAlgorithm::HashValueType>::Update (pString);
+		}
+
+		bool Update (const wchar_t *pString) {
+			return Base::CHashBase<typename HashAlgorithm::HashValueType>::Update (pString);
+		}
+
 		bool Finalize (void) {
 			if (this->State != EComputeState::Updatable) return false;
 			
@@ -261,15 +288,6 @@ namespace HMAC {
 	using CHMACKeySHA512Per224 = CHMACKey<CSHA512Per224>;
 	using CHMACKeySHA512Per256 = CHMACKey<CSHA512Per256>;
 
-	/*
-	using CHMACKeyBuilderSHA1 = CHMACKeyBuilder<CSHA1>;
-	using CHMACKeyBuilderSHA224 = CHMACKeyBuilder<CSHA224>;
-	using CHMACKeyBuilderSHA256 = CHMACKeyBuilder<CSHA256>;
-	using CHMACKeyBuilderSHA384 = CHMACKeyBuilder<CSHA384>;
-	using CHMACKeyBuilderSHA512 = CHMACKeyBuilder<CSHA512>;
-	using CHMACKeyBuilderSHA512Per224 = CHMACKeyBuilder<CSHA512Per224>;
-	using CHMACKeyBuilderSHA512Per256 = CHMACKeyBuilder<CSHA512Per256>;
-	*/
 	using CHMACKeySHA1Builder = CHMACKeyBuilder<CSHA1>;
 	using CHMACKeySHA224Builder = CHMACKeyBuilder<CSHA224>;
 	using CHMACKeySHA256Builder = CHMACKeyBuilder<CSHA256>;

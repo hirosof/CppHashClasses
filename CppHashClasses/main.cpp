@@ -19,6 +19,9 @@ template <typename T> void ShowHash (const hirosof::Hash::Base::CHashBase<T>  &h
 
 }
 
+template <typename T> void ShowHash (const hirosof::Hash::Base::CHashValueBaseAbstruct<T> &hashv) {
+	printf ("%s\n", hashv.ToString ().c_str ());
+}
 
 
 void HMACCodeTest (void);
@@ -29,18 +32,21 @@ int main (void) {
 	using namespace hirosof::Hash::HMAC;
 
 	
-	char keystr[] = "key";
-	
-	CHMACKeySHA512Per224Builder kb;
-	kb.UpdateString (keystr);
-	kb.Finalize ();
+	char keystr[] = "KeyString";
+	char msg[] = "MessageData";
 
-	CHMACSHA512Per224 hmac512_224(kb);
-	hmac512_224.ComputeString ("message");
+	CHMACKeySHA1Builder hmacKeyBuilder;
+	hmacKeyBuilder.Compute (keystr);
 
-	ShowHash (hmac512_224);
+	CHMACSHA1  hmacsha1 (hmacKeyBuilder);
+	hmacsha1.Compute (msg);
 
-	
+	CSHA1Value value;
+	hmacsha1.GetHash (&value);
+	printf ("キー : %s\nメッセージ : %s\n", keystr, msg);
+	printf ("HMAC-SHA1 : ");
+	ShowHash (value);
+
 	return 0;
 }
 void Test (void) {
@@ -68,42 +74,42 @@ void ShowStringHash (const char *pString) {
 
 	CSHA1 sha1;
 	CSHA1Value value1;
-	sha1.UpdateString (pString);
+	sha1.Update (pString);
 	sha1.Finalize ();
 	sha1.GetHash (&value1);
 	printf ("      SHA1 : %s\n", value1.ToString ().c_str ());
 
 	CSHA224  sha224;
 	CSHA224Value value224;
-	sha224.UpdateString (pString);
+	sha224.Update (pString);
 	sha224.Finalize ();
 	sha224.GetHash (&value224);
 	printf ("    SHA224 : %s\n", value224.ToString ().c_str ());
 
 	CSHA256  sha256;
 	CSHA256Value value256;
-	sha256.UpdateString (pString);
+	sha256.Update (pString);
 	sha256.Finalize ();
 	sha256.GetHash (&value256);
 	printf ("    SHA256 : %s\n", value256.ToString ().c_str ());
 
 	CSHA384 sha384;
 	CSHA384Value value384;
-	sha384.UpdateString (pString);
+	sha384.Update (pString);
 	sha384.Finalize ();
 	sha384.GetHash (&value384);
 	printf ("    SHA384 : %s\n", value384.ToString ().c_str ());
 
 	CSHA512 sha512;
 	CSHA512Value value512;
-	sha512.UpdateString (pString);
+	sha512.Update (pString);
 	sha512.Finalize ();
 	sha512.GetHash (&value512);
 	printf ("    SHA512 : %s\n", value512.ToString ().c_str ());
 
 	CSHA512Per224 sha512Per224;
 	CSHA512Per224Value value512Per224;
-	sha512Per224.UpdateString (pString);
+	sha512Per224.Update (pString);
 	sha512Per224.Finalize ();
 	sha512Per224.GetHash (&value512Per224);
 	printf ("SHA512/224 : %s\n", value512Per224.ToString ().c_str ());
@@ -111,7 +117,7 @@ void ShowStringHash (const char *pString) {
 
 	CSHA512Per256 sha512Per256;
 	CSHA512Per256Value value512Per256;
-	sha512Per256.UpdateString (pString);
+	sha512Per256.Update (pString);
 	sha512Per256.Finalize ();
 	sha512Per256.GetHash (&value512Per256);
 	printf ("SHA512/256 : %s\n", value512Per256.ToString ().c_str ());
@@ -140,7 +146,6 @@ void HMACCodeTest (void) {
 	memcpy (k0, key, key_len);
 	memset (k0 + key_len, 0, 64 - key_len);
 
-
 	CSHA1 isha1;
 
 	for (size_t i = 0; i < 64; i++)
@@ -149,10 +154,8 @@ void HMACCodeTest (void) {
 		isha1.Update (&c, 1);
 	}
 
-	isha1.UpdateString (data);
+	isha1.Update (data);
 	isha1.Finalize ();
-
-
 
 	CSHA1 osha1;
 	for (size_t i = 0; i < 64; i++)
@@ -177,15 +180,5 @@ void HMACCodeTest (void) {
 
 
 	ShowHash (osha1);
-
-
-
-
-
-
-
-
-
- 	
 
 }

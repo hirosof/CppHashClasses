@@ -8,7 +8,28 @@ BEGIN_HSHASH_NAMESPACE
 
 namespace Base {
 
-	template <typename T, size_t TElementSize , size_t lastLimitSize = sizeof(T)> class CHashValueBase {
+
+	template<typename T> class CHashValueBaseAbstruct {
+	public:
+
+		virtual size_t GetSize (void) const = 0;
+
+		virtual size_t GetWordSize (void) const = 0;
+
+		virtual size_t CountWordElements (void) const = 0;
+
+		virtual size_t Count (void) const = 0;
+
+		virtual T GetWordValue (size_t index) const = 0;
+
+		virtual uint8_t GetValue (size_t index) const = 0;
+		virtual ::std::string ToString (void) const = 0;
+		virtual ::std::wstring ToWString (void) const = 0;
+
+	};
+
+
+	template <typename T, size_t TElementSize , size_t lastLimitSize = sizeof(T)> class CHashValueBase : public CHashValueBaseAbstruct<T> {
 
 	private:
 		T m_hashValue[TElementSize];
@@ -17,7 +38,7 @@ namespace Base {
 	public:
 
 		using ElementType = T;
-		static const size_t ElementSize = TElementSize;
+		static const size_t m_ElementSize = TElementSize;
 
 		CHashValueBase (void) {
 
@@ -37,24 +58,24 @@ namespace Base {
 			return *this;
 		}
 
-		static size_t GetSize (void) {
+		virtual size_t GetSize (void) const{
 			return sizeof (m_hashValue) -(sizeof (T) - lastLimitSize);
 		}
-
-		static size_t GetWordSize (void) {
+		
+		virtual size_t GetWordSize (void) const{
 			return sizeof (T);
 		}
-
-		static size_t CountWordElements (void) {
+		
+		virtual size_t CountWordElements (void) const{
 			return TElementSize;
 		}
 
-		static size_t Count (void) {
+		virtual size_t Count (void) const{
 			return GetSize ();
 		}
 
 
-		T GetWordValue (size_t index) const {
+		virtual T GetWordValue (size_t index) const {
 			if (index >= TElementSize) throw Exception::COutOfRangeExceptionSizeT (index, 0, TElementSize - 1);
 			T value = m_hashValue[index];
 			if (index == TElementSize - 1) {
@@ -72,7 +93,7 @@ namespace Base {
 			return value;
 		}
 
-		uint8_t GetValue (size_t index) const{
+		virtual uint8_t GetValue (size_t index) const{
 			const size_t wordSize = GetWordSize ();
 			if (index >= GetSize()) throw Exception::COutOfRangeExceptionSizeT (index, 0, GetSize () - 1);
 			size_t valueIndex = index / wordSize;
@@ -86,7 +107,7 @@ namespace Base {
 		}
 
 		
-		::std::string ToString (void) const {
+		virtual ::std::string ToString (void) const {
 			char text[3];
 			::std::string s;
 			for (size_t i = 0; i < this->Count(); i++){
@@ -96,7 +117,7 @@ namespace Base {
 			return s;
 		}
 
-		::std::wstring ToWString (void) const {
+		virtual ::std::wstring ToWString (void) const {
 			wchar_t text[3];
 			::std::wstring s;
 			for (size_t i = 0; i < this->Count(); i++){
