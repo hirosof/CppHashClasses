@@ -13,9 +13,7 @@ namespace HMAC {
 	public:
 
 		using CHash = HashAlgorithm;
-
 		static const size_t m_KeySize = HashAlgorithm::m_MessageBlockSize;
-
 
 		CHMACKey () {
 			for (size_t i = 0; i < m_KeySize; i++)
@@ -53,7 +51,6 @@ namespace HMAC {
 
 	};
 
-
 	template <typename HashAlgorithm> class CHMACKeyBuilder {
 	private:
 		uint8_t m_keyBuffer[HashAlgorithm::m_MessageBlockSize];
@@ -66,9 +63,7 @@ namespace HMAC {
 
 		CHMACKeyBuilder () {
 			this->Reset ();
-
 		}
-
 
 		void Reset (void) {
 			m_KeySaltSize = 0;
@@ -139,9 +134,9 @@ namespace HMAC {
 			if (State != EComputeState::Updatable) return false;
 
 			if (m_KeySaltSize <= HashAlgorithm::m_MessageBlockSize) {
-				memset (&this->m_keyBuffer[this->m_KeySaltSize], 0, static_cast<size_t>(HashAlgorithm::m_MessageBlockSize - m_KeySaltSize));
+				memset (&this->m_keyBuffer[this->m_KeySaltSize], 0, 
+					static_cast<size_t>(HashAlgorithm::m_MessageBlockSize - m_KeySaltSize));
 			} else {
-
 				if (m_hash.Finalize () == false) return false;
 
 				typename CHash::HashValueType value;
@@ -149,7 +144,6 @@ namespace HMAC {
 				if (m_hash.GetHash (&value) == false) return false;
 
 				memset (&this->m_keyBuffer[0], 0, HashAlgorithm::m_MessageBlockSize);
-
 
 				for (size_t i = 0; i < value.Count(); i++)
 				{
@@ -160,7 +154,6 @@ namespace HMAC {
 			State = EComputeState::Finalized;
 
 			return true;
-
 		}
 
 		bool GetKey (CKeyType *pKey) const {
@@ -173,21 +166,18 @@ namespace HMAC {
 		};
 
 	};
-
-
+	
 	template <typename HashAlgorithm> class CHMAC : public Base::CHashBase<typename HashAlgorithm::HashValueType> {
 	public:
 		using CHash = HashAlgorithm;
 		using CKeyType = CHMACKey <HashAlgorithm>;
 		using CKeyBuilder = CHMACKeyBuilder<HashAlgorithm>;
 	private:
-
 		CKeyType m_key;
 		CHash  m_ihash;
 		CHash  m_ohash;
 		EComputeState State;
 	public:
-		
 
 		CHMAC () {
 			Reset ();
@@ -201,10 +191,8 @@ namespace HMAC {
 
 			CKeyType key;
 
-			if (builder.GetKey (&key)) {
-				m_key = key;
-			}
-
+			if (builder.GetKey (&key)) m_key = key;
+			
 			Reset ();
 		}
 
@@ -215,8 +203,7 @@ namespace HMAC {
 
 		void Reset (void) {
 			m_ihash.Reset ();
-			for (size_t i = 0; i < CHash::m_MessageBlockSize; i++)
-			{
+			for (size_t i = 0; i < CHash::m_MessageBlockSize; i++){
 				uint8_t u = m_key[i] ^ 0x36;
 				m_ihash.Update (&u , sizeof (uint8_t));
 			}
@@ -242,23 +229,20 @@ namespace HMAC {
 			this->m_ihash.Finalize ();
 
 			m_ohash.Reset ();
-			for (size_t i = 0; i < CHash::m_MessageBlockSize; i++)
-			{
+
+			for (size_t i = 0; i < CHash::m_MessageBlockSize; i++){
 				uint8_t u = m_key[i] ^ 0x5c;
 				m_ohash.Update (&u , sizeof (uint8_t));
 			}
-
 
 			typename CHash::HashValueType ivalue;
 
 			m_ihash.GetHash (&ivalue);
 
-			for (size_t i = 0; i < ivalue.Count(); i++)
-			{
+			for (size_t i = 0; i < ivalue.Count(); i++){
 				uint8_t u = ivalue.GetValue (i);
 				m_ohash.Update (&u, sizeof (uint8_t));
 			}
-
 
 			m_ohash.Finalize ();
 
@@ -271,9 +255,7 @@ namespace HMAC {
 			return this->m_ohash.GetHash (pHash);
 		}
 
-
 	};
-
 
 	using CHMACKeySHA1 = CHMACKey<CSHA1>;
 	using CHMACKeySHA224 = CHMACKey<CSHA224>;
