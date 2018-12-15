@@ -26,19 +26,19 @@ namespace Base {
 		
 		virtual bool Update (const char *pString) {
 			if (pString == nullptr) return false;
-			return this->Update (pString, strlen (pString));
+			return this->Update (pString, strlen (pString) * sizeof (char));
 		}
 
 		virtual bool Update (const wchar_t *pString) {
 			if (pString == nullptr) return false;
-			return this->Update (pString, wcslen (pString));
+			return this->Update (pString, wcslen (pString) * sizeof(wchar_t));
 		}
 
 		virtual bool Finalize (void) = 0;
 
 		virtual bool GetHash (HashValueType *pHash) const = 0;
 
-		bool Compute (const void *pData, uint64_t dataSize) {
+		virtual bool Compute (const void *pData, uint64_t dataSize) {
 			if (pData == nullptr) return false;
 			if (dataSize > 0) {
 				if (this->Update (pData, dataSize) == false) {
@@ -48,14 +48,14 @@ namespace Base {
 			return this->Finalize ();
 		}
 
-		bool Compute (const char *pString) {
+		virtual bool Compute (const char *pString) {
 			if (pString == nullptr) return false;
-			return this->Compute (pString, strlen (pString));
+			return this->Compute (pString, strlen (pString) * sizeof (char));
 		}
 
-		bool Compute (const wchar_t *pString) {
+		virtual bool Compute (const wchar_t *pString) {
 			if (pString == nullptr) return false;
-			return this->Compute (pString, wcslen (pString));
+			return this->Compute (pString, wcslen (pString) * sizeof (wchar_t));
 		}
 
 	};

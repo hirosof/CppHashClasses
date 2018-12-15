@@ -47,6 +47,8 @@ int main (void) {
 	printf ("HMAC-SHA1 : ");
 	ShowHash (value);
 
+
+
 	return 0;
 }
 void Test (void) {

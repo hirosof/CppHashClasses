@@ -3,12 +3,7 @@
 #include "HSSHA1.hpp"
 #include "HSSHA2.hpp"
 
-
-
 BEGIN_HSHASH_NAMESPACE
-
-
-
 
 namespace HMAC {
 
@@ -112,12 +107,12 @@ namespace HMAC {
 
 		bool Update (const char *pString) {
 			if (pString == nullptr) return false;
-			return this->Update (pString, strlen (pString));
+			return this->Update (pString, strlen (pString) * sizeof (char));
 		}
 
 		bool Update (const wchar_t *pString) {
 			if (pString == nullptr) return false;
-			return this->Update (pString, wcslen (pString));
+			return this->Update (pString, wcslen (pString) * sizeof (wchar_t));
 		}
 
 		bool Compute (const void *pData, uint64_t dataSize) {
@@ -132,12 +127,12 @@ namespace HMAC {
 
 		bool Compute (const char *pString) {
 			if (pString == nullptr) return false;
-			return this->Compute (pString, strlen (pString));
+			return this->Compute (pString, strlen (pString) * sizeof (char));
 		}
 
 		bool Compute (const wchar_t *pString) {
 			if (pString == nullptr) return false;
-			return this->Compute (pString, wcslen (pString));
+			return this->Compute (pString, wcslen (pString) * sizeof (wchar_t));
 		}
 
 		bool Finalize (void) {
