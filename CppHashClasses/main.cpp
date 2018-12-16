@@ -27,26 +27,44 @@ template <typename T> void ShowHash (const hirosof::Hash::Base::CHashValueBaseAb
 void HMACCodeTest (void);
 
 
+template<typename hash> void PrintHMACHash (const char *beforetext , char *key, char *msg) {
+	using namespace hirosof::Hash;
+	using namespace hirosof::Hash::HMAC;	
+
+	typename CHMAC<hash>::CKeyBuilder keybuilder;
+	keybuilder.Compute (key);
+
+	CHMAC<hash>  hmac (keybuilder);
+	hmac.Compute (msg);
+
+	if (beforetext) printf ("%s : ", beforetext);
+	ShowHash (hmac);
+}
+ 
+
 int main (void) {
 	using namespace hirosof::Hash;
 	using namespace hirosof::Hash::HMAC;
 
+
 	
-	char keystr[] = "KeyString";
-	char msg[] = "MessageData";
+	char keystr[] = "key";
 
-	CHMACKeySHA1Builder hmacKeyBuilder;
-	hmacKeyBuilder.Compute (keystr);
 
-	CHMACSHA1  hmacsha1 (hmacKeyBuilder);
-	hmacsha1.Compute (msg);
+	char msg[] = "abcdef";
 
-	CSHA1Value value;
-	hmacsha1.GetHash (&value);
-	printf ("キー : %s\nメッセージ : %s\n", keystr, msg);
-	printf ("HMAC-SHA1 : ");
-	ShowHash (value);
+	ShowStringHash (keystr);
+	ShowStringHash (msg);
 
+	printf ("<<HMAC>>\n");
+	printf ("           キー : %s\n     メッセージ : %s\n\n", keystr, msg);
+	PrintHMACHash<CSHA1> ("      HMAC-SHA1", keystr, msg);
+	PrintHMACHash<CSHA224> ("    HMAC-SHA224", keystr, msg);
+	PrintHMACHash<CSHA256> ("    HMAC-SHA256", keystr, msg);
+	PrintHMACHash<CSHA384> ("    HMAC-SHA384", keystr, msg);
+	PrintHMACHash<CSHA512> ("    HMAC-SHA512", keystr, msg);
+	PrintHMACHash<CSHA512Per224> ("HMAC-SHA512/224", keystr, msg);
+	PrintHMACHash<CSHA512Per256> ("HMAC-SHA512/256", keystr, msg);
 
 
 	return 0;

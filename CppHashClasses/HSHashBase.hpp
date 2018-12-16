@@ -16,6 +16,13 @@ namespace Base {
 
 		using HashValueType = tnHashValueType;
 	
+		virtual bool IsUpdatable (void) const {
+			return State == EComputeState::Updatable;
+		}
+
+		virtual bool IsFilaziled (void) const {
+			return State == EComputeState::Finalized;
+		}
 
 		virtual void Reset (void) = 0;
 
