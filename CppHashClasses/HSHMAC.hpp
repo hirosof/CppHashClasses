@@ -186,21 +186,29 @@ namespace HMAC {
 		}
 
 		CHMAC (const KeyBuilder &keybuilder) {
-
-			KeyBuilder  builder (keybuilder);
-
-			if (builder.IsUpdatable ()) builder.Finalize ();
-
-			KeyType key;
-
-			if (builder.GetKey (&key)) m_key = key;
-			
-			Reset ();
+			this->ResetWithChangeKey (keybuilder);
 		}
 
 		CHMAC (const KeyType &key) {
-			m_key = key;
-			Reset ();
+			this->ResetWithChangeKey (key);
+		}
+
+		CHMAC (const void *pKeyData, uint64_t keyDataSize) {
+			if (this->ResetWithChangeKey (pKeyData, keyDataSize) == false) {
+				Reset ();
+			}
+		}
+
+		CHMAC (const char *pKeyString) {
+			if (this->ResetWithChangeKey (pKeyString) == false) {
+				Reset ();
+			}
+		}
+
+		CHMAC (const wchar_t *pKeyString) {
+			if (this->ResetWithChangeKey (pKeyString) == false) {
+				Reset ();
+			}
 		}
 
 		void Reset (void) {
@@ -210,6 +218,57 @@ namespace HMAC {
 				m_ihash.Update (&u , sizeof (uint8_t));
 			}
 			State = EComputeState::Updatable;
+		}
+
+		bool ResetWithChangeKey (const void *pKeyData, uint64_t keyDataSize) {
+			KeyBuilder kbuilder;
+			if (kbuilder.Compute (pKeyData, keyDataSize)) {
+				return this->ResetWithChangeKey (kbuilder);
+			}
+			return false;
+		}
+
+		bool ResetWithChangeKey (const char *pKeyString) {
+			KeyBuilder kbuilder;
+			if (kbuilder.Compute (pKeyString)) {
+				return this->ResetWithChangeKey (kbuilder);
+			}
+			return false;
+
+		}
+
+		bool ResetWithChangeKey (const wchar_t *pKeyString) {
+			KeyBuilder kbuilder;
+			if (kbuilder.Compute (pKeyString)) {
+				return this->ResetWithChangeKey (kbuilder);
+			}
+			return false;
+
+		}
+
+		bool ResetWithChangeKey (const KeyBuilder &keybuilder) {
+
+			KeyBuilder kbuilder (keybuilder);
+
+			if (kbuilder.IsFilaziled () == false) {
+				if (kbuilder.Finalize () == false) {
+					return false;
+				}
+			}
+
+			KeyType key;
+
+			if (kbuilder.GetKey (&key)) {
+				return this->ResetWithChangeKey (key);
+			}
+
+			return false;
+		}
+
+		bool ResetWithChangeKey (const KeyType &key) {
+			this->m_key = key;
+			this->Reset ();
+			return true;
 		}
 
 		bool Update (const void *pData, uint64_t dataSize) {

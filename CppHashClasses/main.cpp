@@ -73,7 +73,13 @@ int main (void) {
 		printf ("v1 == v3\n");
 	}
 
-	
+	CHMAC_SHA256 hmac_sha256 ("key");
+
+	hmac_sha256.Compute ("abcdef");
+
+	ShowHash (hmac_sha256);
+
+	HMACTest ();
 
 	return 0;
 }
