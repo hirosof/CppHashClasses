@@ -32,7 +32,7 @@ template<typename hash> void PrintHMACHash (const char *beforetext , char *key, 
 	using namespace hirosof::Hash;
 	using namespace hirosof::Hash::HMAC;	
 
-	typename CHMAC<hash>::CKeyBuilder keybuilder;
+	typename CHMAC<hash>::KeyBuilder keybuilder;
 	keybuilder.Compute (key);
 
 	CHMAC<hash>  hmac (keybuilder);
@@ -46,6 +46,7 @@ template<typename hash> void PrintHMACHash (const char *beforetext , char *key, 
 int main (void) {
 
 	using namespace hirosof::Hash;
+	using namespace hirosof::Hash::HMAC;
 
 	CSHA256 sha256;
 	sha256.Compute ("abcdef");
@@ -72,7 +73,7 @@ int main (void) {
 		printf ("v1 == v3\n");
 	}
 
-
+	
 
 	return 0;
 }

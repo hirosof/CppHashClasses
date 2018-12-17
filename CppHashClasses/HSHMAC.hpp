@@ -7,12 +7,12 @@ BEGIN_HSHASH_NAMESPACE
 
 namespace HMAC {
 
-	template <typename HashAlgorithm> class CHMACKey {
+	template <typename tnHashAlgorithm> class CHMACKey {
 	private:
-		uint8_t m_key[HashAlgorithm::m_MessageBlockSize];
+		uint8_t m_key[tnHashAlgorithm::m_MessageBlockSize];
 	public:
 
-		using CHash = HashAlgorithm;
+		using HashAlgorithm = tnHashAlgorithm;
 		static const size_t m_KeySize = HashAlgorithm::m_MessageBlockSize;
 
 		CHMACKey () {
@@ -51,15 +51,17 @@ namespace HMAC {
 
 	};
 
-	template <typename HashAlgorithm> class CHMACKeyBuilder {
+	template <typename tnHashAlgorithm> class CHMACKeyBuilder {
+	public:
+		using HashAlgorithm = tnHashAlgorithm;
+		using KeyType = CHMACKey <HashAlgorithm>;
 	private:
-		uint8_t m_keyBuffer[HashAlgorithm::m_MessageBlockSize];
+		uint8_t m_keyBuffer[tnHashAlgorithm::m_MessageBlockSize];
 		uint64_t m_KeySaltSize;
 		HashAlgorithm m_hash;
 		EComputeState State;
 	public:
-		using CKeyType = CHMACKey <HashAlgorithm>;
-		using CHash = HashAlgorithm;
+
 
 		CHMACKeyBuilder () {
 			this->Reset ();
@@ -139,7 +141,7 @@ namespace HMAC {
 			} else {
 				if (m_hash.Finalize () == false) return false;
 
-				typename CHash::HashValueType value;
+				typename HashAlgorithm::HashValueType value;
 
 				if (m_hash.GetHash (&value) == false) return false;
 
@@ -156,10 +158,10 @@ namespace HMAC {
 			return true;
 		}
 
-		bool GetKey (CKeyType *pKey) const {
+		bool GetKey (KeyType *pKey) const {
 			if (this->State != EComputeState::Finalized) return false;
 			if (pKey != nullptr) {
-				*pKey = CKeyType (this->m_keyBuffer);
+				*pKey = KeyType (this->m_keyBuffer);
 				return true;
 			}
 			return false;
@@ -167,15 +169,15 @@ namespace HMAC {
 
 	};
 	
-	template <typename HashAlgorithm> class CHMAC : public Base::CHashBase<typename HashAlgorithm::HashValueType> {
+	template <typename tnHashAlgorithm> class CHMAC : public Base::CHashBase<typename tnHashAlgorithm::HashValueType> {
 	public:
-		using CHash = HashAlgorithm;
-		using CKeyType = CHMACKey <HashAlgorithm>;
-		using CKeyBuilder = CHMACKeyBuilder<HashAlgorithm>;
+		using HashAlgorithm = tnHashAlgorithm;
+		using KeyType = CHMACKey <HashAlgorithm>;
+		using KeyBuilder = CHMACKeyBuilder<HashAlgorithm>;
 	private:
-		CKeyType m_key;
-		CHash  m_ihash;
-		CHash  m_ohash;
+		KeyType m_key;
+		HashAlgorithm  m_ihash;
+		HashAlgorithm  m_ohash;
 		EComputeState State;
 	public:
 
@@ -183,27 +185,27 @@ namespace HMAC {
 			Reset ();
 		}
 
-		CHMAC (const CKeyBuilder &keybuilder) {
+		CHMAC (const KeyBuilder &keybuilder) {
 
-			CKeyBuilder  builder (keybuilder);
+			KeyBuilder  builder (keybuilder);
 
 			if (builder.IsUpdatable ()) builder.Finalize ();
 
-			CKeyType key;
+			KeyType key;
 
 			if (builder.GetKey (&key)) m_key = key;
 			
 			Reset ();
 		}
 
-		CHMAC (const CKeyType &key) {
+		CHMAC (const KeyType &key) {
 			m_key = key;
 			Reset ();
 		}
 
 		void Reset (void) {
 			m_ihash.Reset ();
-			for (size_t i = 0; i < CHash::m_MessageBlockSize; i++){
+			for (size_t i = 0; i < HashAlgorithm::m_MessageBlockSize; i++){
 				uint8_t u = m_key[i] ^ 0x36;
 				m_ihash.Update (&u , sizeof (uint8_t));
 			}
@@ -230,12 +232,12 @@ namespace HMAC {
 
 			m_ohash.Reset ();
 
-			for (size_t i = 0; i < CHash::m_MessageBlockSize; i++){
+			for (size_t i = 0; i < HashAlgorithm::m_MessageBlockSize; i++){
 				uint8_t u = m_key[i] ^ 0x5c;
 				m_ohash.Update (&u , sizeof (uint8_t));
 			}
 
-			typename CHash::HashValueType ivalue;
+			typename HashAlgorithm::HashValueType ivalue;
 
 			m_ihash.GetHash (&ivalue);
 
@@ -250,36 +252,20 @@ namespace HMAC {
 			return true;
 		}
 
-		bool GetHash (typename CHash::HashValueType  *pHash) const {
+		bool GetHash (typename HashAlgorithm::HashValueType  *pHash) const {
 			if (this->State != EComputeState::Finalized) return false;
 			return this->m_ohash.GetHash (pHash);
 		}
 
 	};
 
-	using CHMACKeySHA1 = CHMACKey<CSHA1>;
-	using CHMACKeySHA224 = CHMACKey<CSHA224>;
-	using CHMACKeySHA256 = CHMACKey<CSHA256>;
-	using CHMACKeySHA384 = CHMACKey<CSHA384>;
-	using CHMACKeySHA512 = CHMACKey<CSHA512>;
-	using CHMACKeySHA512Per224 = CHMACKey<CSHA512Per224>;
-	using CHMACKeySHA512Per256 = CHMACKey<CSHA512Per256>;
-
-	using CHMACKeySHA1Builder = CHMACKeyBuilder<CSHA1>;
-	using CHMACKeySHA224Builder = CHMACKeyBuilder<CSHA224>;
-	using CHMACKeySHA256Builder = CHMACKeyBuilder<CSHA256>;
-	using CHMACKeySHA384Builder = CHMACKeyBuilder<CSHA384>;
-	using CHMACKeySHA512Builder = CHMACKeyBuilder<CSHA512>;
-	using CHMACKeySHA512Per224Builder = CHMACKeyBuilder<CSHA512Per224>;
-	using CHMACKeySHA512Per256Builder = CHMACKeyBuilder<CSHA512Per256>;
-
-	using CHMACSHA1 = CHMAC<CSHA1>;
-	using CHMACSHA224 = CHMAC<CSHA224>;
-	using CHMACSHA256 = CHMAC<CSHA256>;
-	using CHMACSHA384 = CHMAC<CSHA384>;
-	using CHMACSHA512 = CHMAC<CSHA512>;
-	using CHMACSHA512Per224 = CHMAC<CSHA512Per224>;
-	using CHMACSHA512Per256 = CHMAC<CSHA512Per256>;
+	using CHMAC_SHA1 = CHMAC<CSHA1>;
+	using CHMAC_SHA224 = CHMAC<CSHA224>;
+	using CHMAC_SHA256 = CHMAC<CSHA256>;
+	using CHMAC_SHA384 = CHMAC<CSHA384>;
+	using CHMAC_SHA512 = CHMAC<CSHA512>;
+	using CHMAC_SHA512Per224 = CHMAC<CSHA512Per224>;
+	using CHMAC_SHA512Per256 = CHMAC<CSHA512Per256>;
 }
 
 END_HSHASH_NAMESPACE
