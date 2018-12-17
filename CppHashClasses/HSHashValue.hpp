@@ -127,6 +127,22 @@ namespace Base {
 			return s;
 		}
 
+		virtual  bool IsEqual (const CHashValueBase &rhs) const {
+			return memcmp (this->m_hashValue, rhs.m_hashValue, this->GetSize ()) == 0;
+		}
+
+		virtual  bool IsNotEqual (const CHashValueBase &rhs) const {
+			return this->IsEqual (rhs) == false;
+		}
+
+
+		bool operator==(const CHashValueBase &rhs) const {
+			return this->IsEqual (rhs);
+		}
+		bool operator!=(const CHashValueBase &rhs) const {
+			return this->IsNotEqual (rhs);
+		}
+
 	};
 
 }

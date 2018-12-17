@@ -24,7 +24,8 @@ template <typename T> void ShowHash (const hirosof::Hash::Base::CHashValueBaseAb
 }
 
 
-void HMACCodeTest (void);
+void HMACAlgorithmTest (void);
+void HMACTest (void);
 
 
 template<typename hash> void PrintHMACHash (const char *beforetext , char *key, char *msg) {
@@ -43,14 +44,44 @@ template<typename hash> void PrintHMACHash (const char *beforetext , char *key, 
  
 
 int main (void) {
+
+	using namespace hirosof::Hash;
+
+	CSHA256 sha256;
+	sha256.Compute ("abcdef");
+
+	CSHA256Value v1, v2, v3;
+
+	sha256.GetHash (&v1);
+	sha256.GetHash (&v2);
+
+	sha256.Reset ();
+
+	sha256.Compute ("abcdefg");
+	sha256.GetHash (&v3);
+
+	if (v1.IsEqual(v2)) {
+		printf ("v1 == v2\n");
+	} else {
+		printf ("v1 != v2\n");
+	}
+
+	if (v1.IsNotEqual(v3)) {
+		printf ("v1 != v3\n");
+	} else {
+		printf ("v1 == v3\n");
+	}
+
+
+
+	return 0;
+}
+
+void HMACTest (void) {
 	using namespace hirosof::Hash;
 	using namespace hirosof::Hash::HMAC;
 
-
-	
 	char keystr[] = "key";
-
-
 	char msg[] = "abcdef";
 
 	ShowStringHash (keystr);
@@ -65,10 +96,8 @@ int main (void) {
 	PrintHMACHash<CSHA512> ("    HMAC-SHA512", keystr, msg);
 	PrintHMACHash<CSHA512Per224> ("HMAC-SHA512/224", keystr, msg);
 	PrintHMACHash<CSHA512Per256> ("HMAC-SHA512/256", keystr, msg);
-
-
-	return 0;
 }
+
 void Test (void) {
 	ShowStringHash ("");
 	ShowStringHash ("abcdefghijklmnopqrstuvwxyz");
@@ -146,7 +175,7 @@ void ShowStringHash (const char *pString) {
 }
 
 
-void HMACCodeTest (void) {
+void HMACAlgorithmTest (void) {
 
 	using namespace hirosof::Hash;
 
