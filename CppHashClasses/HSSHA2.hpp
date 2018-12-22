@@ -243,7 +243,7 @@ public:
 	virtual bool GetHash (HashValueType *pHash) const;
 };
 
-using CSHA512Per224Value = Base::CHashValueBase<uint64_t, 4, sizeof (uint32_t)>;
+using CSHA512Per224Value = Base::CHashValueBase<uint64_t, 4, EHashValueEndian::Little ,sizeof (uint32_t)>;
 class CSHA512Per224 : public Base::CSHA2_512Base< CSHA512Per224Value> {
 private:
 	static const uint64_t DefaultHash[8];

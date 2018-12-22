@@ -29,7 +29,8 @@ namespace Base {
 	};
 
 
-	template <typename T, size_t TElementSize , size_t lastLimitSize = sizeof(T)> class CHashValueBase : public CHashValueBaseAbstruct<T> {
+	template <typename T, size_t TElementSize , EHashValueEndian  Endian = EHashValueEndian::Little, size_t lastLimitSize = sizeof(T)>
+	class CHashValueBase : public CHashValueBaseAbstruct<T> {
 
 	private:
 		T m_hashValue[TElementSize];
@@ -128,7 +129,13 @@ namespace Base {
 		}
 
 		virtual  bool IsEqual (const CHashValueBase &rhs) const {
-			return memcmp (this->m_hashValue, rhs.m_hashValue, this->GetSize ()) == 0;
+			const size_t cmp_targetsize = sizeof (T) * (TElementSize - 1);
+			if (memcmp (this->m_hashValue, rhs.m_hashValue, cmp_targetsize) != 0) {
+				return false;
+			}
+			T last = this->GetWordValue (TElementSize - 1);
+			T rhs_last = rhs.GetWordValue (TElementSize - 1);
+			return last == rhs_last;
 		}
 
 		virtual  bool IsNotEqual (const CHashValueBase &rhs) const {

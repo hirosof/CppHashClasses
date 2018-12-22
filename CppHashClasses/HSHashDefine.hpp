@@ -12,5 +12,9 @@ enum struct EComputeState {
 	Finalized
 };
 
+enum struct EHashValueEndian {
+	Little = 0,
+	Big
+};
 
 END_HSHASH_NAMESPACE

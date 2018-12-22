@@ -48,38 +48,24 @@ int main (void) {
 	using namespace hirosof::Hash;
 	using namespace hirosof::Hash::HMAC;
 
-	CSHA256 sha256;
-	sha256.Compute ("abcdef");
+	CSHA256 sha;
 
-	CSHA256Value v1, v2, v3;
+	sha.Compute ("’r“c");
 
-	sha256.GetHash (&v1);
-	sha256.GetHash (&v2);
 
-	sha256.Reset ();
-
-	sha256.Compute ("abcdefg");
-	sha256.GetHash (&v3);
-
-	if (v1.IsEqual(v2)) {
-		printf ("v1 == v2\n");
-	} else {
-		printf ("v1 != v2\n");
+	CSHA256::HashValueType value;
+	if (sha.GetHash (&value)) {
+		/*
+		for (size_t i = 0; i < value.Count(); i++) {
+			printf ("%02x", value.GetValue(i));
+		}
+		printf ("\n");
+		*/
+		printf ("%s\n", value.ToString ().c_str ());
 	}
 
-	if (v1.IsNotEqual(v3)) {
-		printf ("v1 != v3\n");
-	} else {
-		printf ("v1 == v3\n");
-	}
+	CHMAC_SHA256 hmac ("aaa");
 
-	CHMAC_SHA256 hmac_sha256 ("key");
-
-	hmac_sha256.Compute ("abcdef");
-
-	ShowHash (hmac_sha256);
-
-	HMACTest ();
 
 	return 0;
 }
