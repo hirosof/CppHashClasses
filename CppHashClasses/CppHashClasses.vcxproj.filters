@@ -53,6 +53,9 @@
     <ClInclude Include="HSHashCommonFunctions.hpp">
       <Filter>ヘッダー ファイル</Filter>
     </ClInclude>
+    <ClInclude Include="HSHashMessageBlockBufferingEngine.hpp">
+      <Filter>ヘッダー ファイル</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <None Include="cpp.hint" />

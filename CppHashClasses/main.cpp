@@ -52,6 +52,8 @@ int main (void) {
 
 	using namespace hirosof::Hash;
 	using namespace hirosof::Hash::HMAC;
+	
+	
 	/*
 	CSHA256 sha;
 
@@ -65,8 +67,10 @@ int main (void) {
 	}
 
 	CHMAC_SHA256 hmac ("aaa");
+	*/
+
 	Test ();
-	HMACTest ();*/
+	HMACTest ();
 
 	
 	using TestValueType = Base::CHashValueBase<uint32_t, 2, EHashValueEndian::Big>;
