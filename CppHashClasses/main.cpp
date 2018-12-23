@@ -41,7 +41,12 @@ template<typename hash> void PrintHMACHash (const char *beforetext , char *key, 
 	if (beforetext) printf ("%s : ", beforetext);
 	ShowHash (hmac);
 }
- 
+
+union MyUnion {
+	uint32_t  u32[2];
+	uint8_t u8[8];
+};
+
 
 int main (void) {
 
@@ -63,8 +68,25 @@ int main (void) {
 	Test ();
 	HMACTest ();*/
 
-	uint32_t  a = 0xFACB4703;
-	printf ("%08X -> %08X\n", a, Functions::InverseEndian (a));
+	
+	using TestValueType = Base::CHashValueBase<uint32_t, 2, EHashValueEndian::Big>;
+
+
+	MyUnion mu;
+
+	mu.u8[0] = 0xA0;
+	mu.u8[1] = 0x46;
+	mu.u8[2] = 0x32;
+	mu.u8[3] = 0x78;
+	mu.u8[4] = 0xF2;
+	mu.u8[5] = 0xBC;
+	mu.u8[6] = 0x51;
+	mu.u8[7] = 0xDE;
+
+
+	TestValueType tvt (mu.u32);
+
+	printf ("%s\n", tvt.ToString ().c_str ());
 
 	return 0;
 }

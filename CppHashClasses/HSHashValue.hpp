@@ -49,6 +49,9 @@ namespace Base {
 		CHashValueBase (const T (&hashValue)[TElementSize]) {
 			for (size_t i = 0; i < TElementSize; i++){
 				m_hashValue[i] = hashValue[i];
+				if (Endian == EHashValueEndian::Big) {
+					m_hashValue[i] = Functions::InverseEndian (m_hashValue[i]);
+				}
 			}
 		}
 
