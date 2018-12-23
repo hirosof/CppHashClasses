@@ -1,6 +1,7 @@
 #pragma once
 
 #include "HSHashException.hpp"
+#include "HSHashCommonFunctions.hpp"
 #include <cstdio>
 #include <string>
 

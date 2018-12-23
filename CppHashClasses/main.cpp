@@ -47,7 +47,7 @@ int main (void) {
 
 	using namespace hirosof::Hash;
 	using namespace hirosof::Hash::HMAC;
-
+	/*
 	CSHA256 sha;
 
 	sha.Compute ("’r“c");
@@ -55,17 +55,16 @@ int main (void) {
 
 	CSHA256::HashValueType value;
 	if (sha.GetHash (&value)) {
-		/*
-		for (size_t i = 0; i < value.Count(); i++) {
-			printf ("%02x", value.GetValue(i));
-		}
-		printf ("\n");
-		*/
+
 		printf ("%s\n", value.ToString ().c_str ());
 	}
 
 	CHMAC_SHA256 hmac ("aaa");
+	Test ();
+	HMACTest ();*/
 
+	uint32_t  a = 0xFACB4703;
+	printf ("%08X -> %08X\n", a, Functions::InverseEndian (a));
 
 	return 0;
 }

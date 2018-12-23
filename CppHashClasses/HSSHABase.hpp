@@ -118,18 +118,5 @@ namespace Base {
 	};
 }
 
-namespace Functions {
-	template <typename T> T LeftRotate (T   value, uint32_t numberOfRotateBits) {
-		uint32_t  typeBits = sizeof (T) * 8;
-		uint32_t realRotateBits = numberOfRotateBits % typeBits;
-		return (value << realRotateBits) | (value >> (typeBits - realRotateBits));
-	}
-
-	template <typename T> T RightRotate (T   value, uint32_t numberOfRotateBits) {
-		uint32_t  typeBits = sizeof (T) * 8;
-		uint32_t realRotateBits = numberOfRotateBits % typeBits;
-		return (value >> realRotateBits) | (value << (typeBits - realRotateBits));
-	}
-}
 
 END_HSHASH_NAMESPACE
