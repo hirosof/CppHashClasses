@@ -15,7 +15,7 @@ namespace Base {
 	public:
 
 		using HashValueType = tnHashValueType;
-	
+
 		virtual bool IsUpdatable (void) const {
 			return State == EComputeState::Updatable;
 		}
@@ -30,7 +30,7 @@ namespace Base {
 		virtual bool Update (const void *pData, uint64_t dataSize) {
 			return false;
 		}
-		
+
 		virtual bool Update (const char *pString) {
 			if (pString == nullptr) return false;
 			return this->Update (pString, strlen (pString) * sizeof (char));
@@ -38,7 +38,7 @@ namespace Base {
 
 		virtual bool Update (const wchar_t *pString) {
 			if (pString == nullptr) return false;
-			return this->Update (pString, wcslen (pString) * sizeof(wchar_t));
+			return this->Update (pString, wcslen (pString) * sizeof (wchar_t));
 		}
 
 		virtual bool Finalize (void) = 0;
@@ -65,6 +65,16 @@ namespace Base {
 			return this->Compute (pString, wcslen (pString) * sizeof (wchar_t));
 		}
 
+		template <typename ElementType> bool Put (ElementType value) {
+			return this->Update (&value, sizeof (ElementType));
+		}
+
+		template <typename ElementType, size_t NumberOfElements> bool ArrayPut (ElementType (&values)[NumberOfElements]) {
+			return this->Update (&values, sizeof (ElementType) *NumberOfElements);
+		}
+		template <typename ElementType> bool ArrayPut (ElementType *pElement, size_t NumberOfElements) {
+			return this->Update (pElement, sizeof (ElementType) *NumberOfElements);
+		}
 	};
 
 	template <size_t MessageBlockSize, typename MessageSizeType, typename HashValueType>

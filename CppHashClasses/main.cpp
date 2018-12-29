@@ -40,7 +40,27 @@ int main (void) {
 
 	using namespace hirosof::Hash;
 	using namespace hirosof::Hash::HMAC;
-	HMACHashTest ("key", "data",true);
+	//HMACHashTest ("key", "data",true);
+	
+	
+	CSHA256 hash;
+
+
+	char a[10000];
+
+	memset (a, 0, sizeof(a));
+	int s = 1000000000 / sizeof(a);
+	printf ("S");
+	for (int i = 0; i < s; i++) {
+		hash.ArrayPut (a);
+	}
+	printf ("E\n");
+
+	
+	hash.Finalize ();
+
+	ShowHash (hash);
+
 	return 0;
 }
 
