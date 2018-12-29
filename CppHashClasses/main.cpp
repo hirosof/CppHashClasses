@@ -1,5 +1,8 @@
 #include <stdio.h>
+#include <Windows.h>
 #include "HSHMAC.hpp"
+
+#pragma comment(lib ,"winmm.lib")
 
 template <typename T> void ShowHash (const hirosof::Hash::Base::CHashBase<T>  &hash) {
 	T value;
@@ -36,39 +39,19 @@ template<typename hash> void PrintHash (const char *beforetext, const char *msg)
 bool NormalHashTest (const char *pmsg);
 bool HMACHashTest (const char *pkey,const char *pmsg , bool withShowNormalHashFlag = true);
 
+void FileHashCalcTest (void);
+
 int main (void) {
 
 	using namespace hirosof::Hash;
 	using namespace hirosof::Hash::HMAC;
-	//HMACHashTest ("key", "data",true);
-	
-	
-	CSHA256 hash;
-
-
-	char a[10000];
-
-	memset (a, 0, sizeof(a));
-	int s = 1000000000 / sizeof(a);
-	printf ("S");
-	for (int i = 0; i < s; i++) {
-		hash.ArrayPut (a);
-	}
-	printf ("E\n%I64u MB\n", hash.GetCurrentMessageSize ()/1000/1000);
-
-	
-	hash.Finalize ();
-
-	ShowHash (hash);
-
+	HMACHashTest ("keystring", "target-data",true);
 	return 0;
 }
 
 bool NormalHashTest (const char *pmsg) {
 	using namespace hirosof::Hash;
-
 	if (pmsg == nullptr) return false;
-
 	printf ("<<Normal Hash>>\n");
 	printf ("メッセージ : %s\n", pmsg);
 	PrintHash<CMD5> ("       MD5", pmsg);
@@ -86,15 +69,12 @@ bool NormalHashTest (const char *pmsg) {
 bool HMACHashTest (const char *pkey, const char *pmsg, bool withShowNormalHashFlag){
 	using namespace hirosof::Hash;
 	using namespace hirosof::Hash::HMAC;
-
 	if (pkey == nullptr) return false;
 	if (pmsg == nullptr) return false;
-
 	if (withShowNormalHashFlag) {
 		NormalHashTest (pkey);
 		NormalHashTest (pmsg);
 	}
-
 	printf ("<<HMAC>>\n");
 	printf ("           キー : %s\n     メッセージ : %s\n", pkey, pmsg);
 	PrintHMACHash<CMD5> ("       HMAC-MD5", pkey, pmsg);
@@ -106,6 +86,61 @@ bool HMACHashTest (const char *pkey, const char *pmsg, bool withShowNormalHashFl
 	PrintHMACHash<CSHA512Per224> ("HMAC-SHA512/224", pkey, pmsg);
 	PrintHMACHash<CSHA512Per256> ("HMAC-SHA512/256", pkey, pmsg);
 	printf ("\n");
-
 	return true;
+}
+
+void FileHashCalcTest (void) {
+	using namespace hirosof::Hash;
+
+	HANDLE hFile = CreateFileW (L"D:\\DummyFiles\\Dummy_2GB", GENERIC_READ, FILE_SHARE_READ, NULL, OPEN_EXISTING, FILE_ATTRIBUTE_NORMAL, NULL);
+
+	if (hFile == INVALID_HANDLE_VALUE) {
+		printf ("file openerror\n");
+		return;
+	}
+
+	DWORD msize = 1024 * 1024 * 1;
+	void *pData = HeapAlloc (GetProcessHeap (), HEAP_ZERO_MEMORY, msize);
+
+
+	DWORD loadedsize;
+	SetFilePointer (hFile, 0, NULL, FILE_BEGIN);
+
+	DWORD start = timeGetTime ();
+	CSHA256 hash;
+
+	char  text[128];
+
+	DWORD filesize = GetFileSize (hFile, NULL);
+
+	do {
+
+		if (ReadFile (hFile, pData, msize, &loadedsize, NULL) == FALSE) {
+			break;
+		}
+
+		if (loadedsize == 0) {
+			break;
+		}
+
+		hash.Update (pData, loadedsize);
+
+
+		if (filesize != 0) {
+			uint64_t currentsize = hash.GetCurrentMessageSize ();
+			wsprintfA (text, "[%u ms][%I64u%%] %I64u / %u Bytes", timeGetTime () - start, currentsize * 100 / filesize, currentsize, filesize);
+		} else {
+			wsprintfA (text, "%I64u Bytes", hash.GetCurrentMessageSize ());
+		}
+		SetConsoleTitleA (text);
+
+
+	} while (msize == loadedsize);
+
+	hash.Finalize ();
+	DWORD end = timeGetTime ();
+	printf ("%u ms\n", end - start);
+	ShowHash (hash);
+
+	CloseHandle (hFile);
 }

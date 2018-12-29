@@ -167,6 +167,17 @@ namespace HMAC {
 			return false;
 		};
 
+		template <typename ElementType> bool Put (ElementType value) {
+			return this->Update (&value, sizeof (ElementType));
+		}
+
+		template <typename ElementType, size_t NumberOfElements> bool ArrayPut (ElementType (&values)[NumberOfElements]) {
+			return this->Update (&values, sizeof (ElementType) *NumberOfElements);
+		}
+		template <typename ElementType> bool ArrayPut (ElementType *pElement, size_t NumberOfElements) {
+			return this->Update (pElement, sizeof (ElementType) *NumberOfElements);
+		}
+
 	};
 	
 	template <typename tnHashAlgorithm> class CHMAC : public Base::CHashBase<typename tnHashAlgorithm::HashValueType> {
