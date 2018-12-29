@@ -147,12 +147,14 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="HSHashMD5.cpp" />
     <ClCompile Include="HSSHA1.cpp" />
     <ClCompile Include="HSSHA2.cpp" />
     <ClCompile Include="main.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="HSHashCommonFunctions.hpp" />
+    <ClInclude Include="HSHashMD5.hpp" />
     <ClInclude Include="HSHashMessageBlockBufferingEngine.hpp" />
     <ClInclude Include="HSHMAC.hpp" />
     <ClInclude Include="HSSHA2.hpp" />

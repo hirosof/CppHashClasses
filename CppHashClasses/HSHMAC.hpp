@@ -2,7 +2,7 @@
 
 #include "HSSHA1.hpp"
 #include "HSSHA2.hpp"
-
+#include "HSHashMD5.hpp"
 BEGIN_HSHASH_NAMESPACE
 
 namespace HMAC {
@@ -318,6 +318,7 @@ namespace HMAC {
 
 	};
 
+	using CHMAC_MD5 = CHMAC<CMD5>;
 	using CHMAC_SHA1 = CHMAC<CSHA1>;
 	using CHMAC_SHA224 = CHMAC<CSHA224>;
 	using CHMAC_SHA256 = CHMAC<CSHA256>;
