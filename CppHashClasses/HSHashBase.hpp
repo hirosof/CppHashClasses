@@ -104,6 +104,12 @@ namespace Base {
 			m_AllMessageSize = 0;
 		}
 
+
+		virtual MessageSizeType GetCurrentMessageSize (void) const {
+			return this->m_AllMessageSize;
+		}
+
+
 	};
 }
 

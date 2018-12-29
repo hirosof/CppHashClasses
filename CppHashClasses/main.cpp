@@ -54,7 +54,7 @@ int main (void) {
 	for (int i = 0; i < s; i++) {
 		hash.ArrayPut (a);
 	}
-	printf ("E\n");
+	printf ("E\n%I64u MB\n", hash.GetCurrentMessageSize ()/1000/1000);
 
 	
 	hash.Finalize ();
