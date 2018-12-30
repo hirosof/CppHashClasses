@@ -45,6 +45,8 @@ namespace Base {
 
 		virtual bool GetHash (HashValueType *pHash) const = 0;
 
+		virtual bool GetIntermediateHash (HashValueType *pHash) = 0;
+
 		virtual bool Compute (const void *pData, uint64_t dataSize) {
 			if (pData == nullptr) return false;
 			if (dataSize > 0) {
@@ -107,6 +109,35 @@ namespace Base {
 
 		virtual MessageSizeType GetCurrentMessageSize (void) const {
 			return this->m_AllMessageSize;
+		}
+
+		virtual bool GetIntermediateHash (HashValueType *pHash) {
+			if (pHash == nullptr) return false;
+			if (this->IsFilaziled ()) return this->GetHash (pHash);
+			
+			bool bRet = false;
+
+			//現在の状態をバックアップする
+			uint8_t backup_MessageBlock[MessageBlockSize];
+			MessageSizeType  backup_AllMessageSize;
+			size_t backup_MessageAddPosition;
+			memcpy (backup_MessageBlock, this->m_MessageBlock, MessageBlockSize);
+			backup_AllMessageSize = this->m_AllMessageSize;
+			backup_MessageAddPosition = this->m_MessageAddPosition;
+
+			//ファイナライズをしてハッシュを取得する
+			if (this->Finalize ()) {
+				bRet = this->GetHash (pHash);
+			}
+
+
+			//バックアップから状態を復元する
+			memcpy (this->m_MessageBlock,backup_MessageBlock,  MessageBlockSize);
+			this->m_AllMessageSize = backup_AllMessageSize;
+			this->m_MessageAddPosition = backup_MessageAddPosition;
+			this->State = EComputeState::Updatable;
+
+			return bRet;
 		}
 
 

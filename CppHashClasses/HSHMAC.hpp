@@ -327,6 +327,21 @@ namespace HMAC {
 			return this->m_ohash.GetHash (pHash);
 		}
 
+		bool GetIntermediateHash (typename HashAlgorithm::HashValueType *pHash) {
+			
+			if (pHash == nullptr) return false;
+			if (this->IsFilaziled ()) return this->GetHash (pHash);
+	
+			CHMAC clone_instance (*this);
+
+			if (clone_instance.Finalize ()) {
+				return clone_instance.GetHash (pHash);
+			}
+
+			return false;
+		}
+
+
 	};
 
 	using CHMAC_MD5 = CHMAC<CMD5>;

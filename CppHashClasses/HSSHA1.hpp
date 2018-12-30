@@ -7,7 +7,6 @@ BEGIN_HSHASH_NAMESPACE
 using CSHA1Value = Base::CHashValueBase<uint32_t, 5>;
 class CSHA1 : public Base::CSHABase32BitUnit<CSHA1Value> {
 private:
-
 	static const uint32_t m_DefaultHash[5];
 	uint32_t m_HashBlockData[5];
 	
@@ -20,6 +19,7 @@ public:
 	CSHA1 ();
 	virtual void Reset (void);
 	virtual bool GetHash (HashValueType *pHash) const;
+	virtual bool GetIntermediateHash (HashValueType *pHash);
 };
 
 END_HSHASH_NAMESPACE

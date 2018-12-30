@@ -38,6 +38,9 @@ public:
 	virtual bool Finalize (void);
 
 	virtual bool GetHash (HashValueType *pHash) const;
+
+	virtual bool GetIntermediateHash (HashValueType *pHash);
+
 };
 
 

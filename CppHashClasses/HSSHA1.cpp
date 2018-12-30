@@ -90,3 +90,23 @@ bool hirosof::Hash::CSHA1::GetHash (HashValueType * pHash) const
 	return false;
 }
 
+bool hirosof::Hash::CSHA1::GetIntermediateHash (HashValueType * pHash) {
+	if (pHash == nullptr) return false;
+	if (this->IsFilaziled ()) return this->GetHash (pHash);
+
+	//親クラスの型
+	using Parent = Base::CSHABase32BitUnit<CSHA1Value>;
+
+	//ハッシュブロックデータのバックアップ
+	uint32_t backup_HashBlockData[5];
+	memcpy (backup_HashBlockData, this->m_HashBlockData, sizeof (this->m_HashBlockData));
+
+	//中間ハッシュの取得
+	bool bRet = Parent::GetIntermediateHash (pHash);
+
+	//ハッシュブロックデータの復元
+	memcpy (this->m_HashBlockData, backup_HashBlockData, sizeof (this->m_HashBlockData));
+
+	return bRet;
+}
+

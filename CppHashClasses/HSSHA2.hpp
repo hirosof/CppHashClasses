@@ -96,6 +96,26 @@ namespace Base {
 			memcpy (this->m_HashBlockData, this->m_DefaultHash, sizeof (m_DefaultHash));
 			this->State = EComputeState::Updatable;
 		}
+
+		virtual bool GetIntermediateHash (HashValueType *pHash) {
+			if (pHash == nullptr) return false;
+			if (this->IsFilaziled ()) return this->GetHash (pHash);
+
+			//親クラスの型
+			using Parent = Base::CSHABase32BitUnit<HashValueType>;
+
+			//ハッシュブロックデータのバックアップ
+			uint32_t backup_HashBlockData[8];
+			memcpy (backup_HashBlockData, this->m_HashBlockData, sizeof (this->m_HashBlockData));
+
+			//中間ハッシュの取得
+			bool bRet = Parent::GetIntermediateHash (pHash);
+
+			//ハッシュブロックデータの復元
+			memcpy (this->m_HashBlockData, backup_HashBlockData, sizeof (this->m_HashBlockData));
+
+			return bRet;
+		}
 	};
 
 	template <typename HashValueType> class CSHA2_512Base : public CSHABase64BitUnit<HashValueType> {
@@ -203,6 +223,27 @@ namespace Base {
 			memcpy (this->m_HashBlockData, this->m_DefaultHash, sizeof (m_DefaultHash));
 			this->State = EComputeState::Updatable;
 		}
+
+		virtual bool GetIntermediateHash (HashValueType *pHash) {
+			if (pHash == nullptr) return false;
+			if (this->IsFilaziled ()) return this->GetHash (pHash);
+
+			//親クラスの型
+			using Parent = Base::CSHABase64BitUnit<HashValueType>;
+
+			//ハッシュブロックデータのバックアップ
+			uint64_t backup_HashBlockData[8];
+			memcpy (backup_HashBlockData, this->m_HashBlockData, sizeof (this->m_HashBlockData));
+
+			//中間ハッシュの取得
+			bool bRet = Parent::GetIntermediateHash (pHash);
+
+			//ハッシュブロックデータの復元
+			memcpy (this->m_HashBlockData, backup_HashBlockData, sizeof (this->m_HashBlockData));
+
+			return bRet;
+		}
+
 	};
 
 }
