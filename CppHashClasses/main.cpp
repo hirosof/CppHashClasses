@@ -46,27 +46,6 @@ int main (void) {
 	using namespace hirosof::Hash;
 	using namespace hirosof::Hash::HMAC;
 	HMACHashTest ("keystring", "target-data",true);
-//	FileHashCalcTest ();
-
-
-	/*
-	CSHA256 sha256;
-	if (sha256.Compute ("string")) {
-		CSHA256Value value256;
-
-		if (sha256.GetHash (&value256)) {
-
-
-			for (size_t i = 0; i < value256.Count(); i++) {
-				printf ("%02x" , value256[i]);
-			}
-			printf ("\n");
-		}
-
-	}
-	*/
-
-
 
 	return 0;
 }

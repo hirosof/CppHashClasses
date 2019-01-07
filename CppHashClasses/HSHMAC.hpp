@@ -189,7 +189,6 @@ namespace HMAC {
 		KeyType m_key;
 		HashAlgorithm  m_ihash;
 		HashAlgorithm  m_ohash;
-		//EComputeState State;
 	public:
 
 		CHMAC () {
