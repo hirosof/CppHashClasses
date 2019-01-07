@@ -4,12 +4,12 @@
 
 #pragma comment(lib ,"winmm.lib")
 
-template <typename T> void ShowHash (const hirosof::Hash::Base::CHashBase<T>  &hash) {
+template <typename T> void ShowHash (hirosof::Hash::Base::CHashBase<T>  &hash) {
 	T value;
-	if (hash.GetHash (&value)) {
+	if (hash.GetIntermediateHash (&value)) {
 		printf ("%s\n", value.ToString ().c_str ());
 	} else {
-		printf ("err\n");
+		printf ("err0\n");
 	}
 }
 
@@ -46,6 +46,28 @@ int main (void) {
 	using namespace hirosof::Hash;
 	using namespace hirosof::Hash::HMAC;
 	HMACHashTest ("keystring", "target-data",true);
+//	FileHashCalcTest ();
+
+
+	/*
+	CSHA256 sha256;
+	if (sha256.Compute ("string")) {
+		CSHA256Value value256;
+
+		if (sha256.GetHash (&value256)) {
+
+
+			for (size_t i = 0; i < value256.Count(); i++) {
+				printf ("%02x" , value256[i]);
+			}
+			printf ("\n");
+		}
+
+	}
+	*/
+
+
+
 	return 0;
 }
 
@@ -92,14 +114,15 @@ bool HMACHashTest (const char *pkey, const char *pmsg, bool withShowNormalHashFl
 void FileHashCalcTest (void) {
 	using namespace hirosof::Hash;
 
-	HANDLE hFile = CreateFileW (L"D:\\DummyFiles\\Dummy_2GB", GENERIC_READ, FILE_SHARE_READ, NULL, OPEN_EXISTING, FILE_ATTRIBUTE_NORMAL, NULL);
+	HANDLE hFile = CreateFileW (L"D:\\DummyFiles\\Dummy_200MB", GENERIC_READ, FILE_SHARE_READ, NULL, OPEN_EXISTING, FILE_ATTRIBUTE_NORMAL, NULL);
 
 	if (hFile == INVALID_HANDLE_VALUE) {
 		printf ("file openerror\n");
 		return;
 	}
+	DWORD filesize = GetFileSize (hFile, NULL);
 
-	DWORD msize = 1024 * 1024 * 1;
+	DWORD msize =  1024 * 1024 * 1;
 	void *pData = HeapAlloc (GetProcessHeap (), HEAP_ZERO_MEMORY, msize);
 
 
@@ -111,7 +134,6 @@ void FileHashCalcTest (void) {
 
 	char  text[128];
 
-	DWORD filesize = GetFileSize (hFile, NULL);
 
 	do {
 

@@ -189,7 +189,7 @@ namespace HMAC {
 		KeyType m_key;
 		HashAlgorithm  m_ihash;
 		HashAlgorithm  m_ohash;
-		EComputeState State;
+		//EComputeState State;
 	public:
 
 		CHMAC () {
@@ -228,7 +228,7 @@ namespace HMAC {
 				uint8_t u = m_key[i] ^ 0x36;
 				m_ihash.Update (&u , sizeof (uint8_t));
 			}
-			State = EComputeState::Updatable;
+			this->State = EComputeState::Updatable;
 		}
 
 		bool ResetWithChangeKey (const void *pKeyData, uint64_t keyDataSize) {
@@ -318,7 +318,7 @@ namespace HMAC {
 
 			m_ohash.Finalize ();
 
-			State = EComputeState::Finalized;
+			this->State = EComputeState::Finalized;
 			return true;
 		}
 
