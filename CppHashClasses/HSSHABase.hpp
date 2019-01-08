@@ -57,7 +57,7 @@ namespace Base {
 			//0x80をセットした位置が896ビット目(112バイト目) 
 			//以上であればハッシュブロックを実行する
 			if (this->m_MessageAddPosition >= 112) {
-				uint32_t targetSize = this->m_MessageAddPosition;
+				size_t targetSize = this->m_MessageAddPosition;
 				this->BlockProcess ();
 				memset (this->m_MessageBlock, 0, targetSize);
 			}
